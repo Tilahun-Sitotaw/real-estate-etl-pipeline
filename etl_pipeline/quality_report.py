@@ -1,0 +1,124 @@
+"""
+Quality and Execution Reporting Module for Real Estate ETL Pipeline.
+
+Generates consolidated, professional reports in both JSON and Markdown formats,
+summarizing data quality metrics, memory usage, processing throughput, and errors.
+"""
+
+import json
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Any
+
+
+class QualityReportGenerator:
+    """
+    Generates and persists audit reports for the ETL pipeline.
+    """
+    
+    def __init__(self, reports_dir: str):
+        self.reports_dir = Path(reports_dir)
+        self.reports_dir.mkdir(parents=True, exist_ok=True)
+        
+    def generate_consolidated_report(
+        self,
+        extraction_summary: Dict[str, Any],
+        transformation_summary: Dict[str, Any],
+        load_summary: Dict[str, Any],
+        pipeline_duration_seconds: float
+    ) -> Dict[str, str]:
+        """
+        Produce both JSON and Markdown reports and save to disk.
+        
+        Returns:
+            Dictionary containing paths to generated files: {'json_path': ..., 'md_path': ...}
+        """
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        report_data = {
+            'report_metadata': {
+                'title': 'Nationwide Real Estate Property Assessment ETL Report',
+                'generated_at': datetime.now().isoformat(),
+                'pipeline_duration_seconds': round(pipeline_duration_seconds, 2)
+            },
+            'extraction': extraction_summary,
+            'transformation': transformation_summary,
+            'loading': load_summary
+        }
+        
+        # Save JSON
+        json_filename = f"etl_execution_report_{timestamp}.json"
+        json_path = self.reports_dir / json_filename
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, indent=2)
+            
+        # Save Markdown
+        md_filename = f"etl_execution_report_{timestamp}.md"
+        md_path = self.reports_dir / md_filename
+        md_content = self._render_markdown_report(report_data)
+        with open(md_path, 'w', encoding='utf-8') as f:
+            f.write(md_content)
+            
+        return {
+            'json_path': str(json_path),
+            'md_path': str(md_path)
+        }
+
+    def _render_markdown_report(self, data: Dict[str, Any]) -> str:
+        """Render markdown formatted text."""
+        ext = data['extraction']
+        trans = data['transformation']
+        load = data['loading']
+        issues = trans.get('issues_breakdown', {})
+        
+        md = f"""# 📊 Real Estate ETL Pipeline Execution & Data Quality Report
+
+**Execution Timestamp:** {data['report_metadata']['generated_at']}  
+**Total Execution Time:** {data['report_metadata']['pipeline_duration_seconds']} seconds  
+
+---
+
+## 1. Executive Summary
+
+| Metric | Value |
+| :--- | :--- |
+| **Total Raw Records Extracted** | {ext.get('total_records_read', 0):,} |
+| **Cleaned & Retained Records** | {trans.get('total_retained', 0):,} |
+| **Discarded Defective Records** | {trans.get('total_discarded', 0):,} |
+| **Retention Rate** | **{trans.get('retention_rate_pct', 0.0)}%** |
+| **Average Data Quality Score** | **{trans.get('avg_data_quality_score', 0.0)} / 100** |
+| **Total Records Inserted into PostgreSQL** | {load.get('total_inserted_or_updated', 0):,} |
+| **Final RAM Memory Profile** | {ext.get('final_memory_usage_mb', 0.0)} MB |
+
+---
+
+## 2. Extraction Phase Statistics
+- **Source File:** `{ext.get('file_path')}`
+- **Batch Chunk Size:** {ext.get('chunk_size', 0):,} records per chunk
+- **Chunks Processed:** {ext.get('total_chunks_processed', 0)}
+- **Streaming Throughput:** {ext.get('records_per_second', 0):,} records/second
+- **Extraction Time:** {ext.get('total_extraction_time_seconds', 0)} seconds
+
+---
+
+## 3. Data Transformation & Quality Remediation
+The automated cleaning rules detected and handled the following data defects:
+
+- **Missing / Zero / Negative Sale Prices:** {issues.get('missing_or_non_positive_price', 0):,} records excluded
+- **Corrupted / Invalid Postcodes:** {issues.get('invalid_or_missing_postcode', 0):,} records excluded
+- **Malformed / Unparseable Dates:** {issues.get('invalid_or_missing_date', 0):,} records excluded
+- **Missing Location Identifiers (City/Town):** {issues.get('missing_location_info', 0):,} records excluded
+- **Cryptographic Duplicate Records (SHA-256):** {issues.get('duplicates_excluded', 0):,} duplicates purged
+- **Statistical Valuation Outliers Flagged:** {issues.get('price_outliers_flagged', 0):,} records tagged
+
+---
+
+## 4. PostgreSQL Database Loading
+- **Execution Mode:** `{load.get('mode')}` (Dry-Run: `{load.get('dry_run')}`)
+- **Total Batches Executed:** {load.get('total_batches_executed', 0):,}
+- **Database Write Errors:** {load.get('total_errors', 0)}
+- **Database Insert Throughput:** {load.get('records_per_second', 0):,} records/second
+
+---
+*Report automatically generated by Real Estate ETL Pipeline Engine.*
+"""
+        return md

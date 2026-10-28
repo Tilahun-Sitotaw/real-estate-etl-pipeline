@@ -1,0 +1,58 @@
+{
+  "source": {
+    "file_path": "./Dataset/uk_property_price_paid_geo.csv",
+    "chunk_size": 50000,
+    "record_limit": 2500000
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "real_estate",
+    "user": "postgres",
+    "password": "1234",
+    "schema": "public"
+  },
+  "processing": {
+    "batch_insert_size": 1000,
+    "memory_threshold_mb": 1024,
+    "price_percentile_low": 1,
+    "price_percentile_high": 99
+  },
+  "reference_data": {
+    "valid_property_types": [
+      "Detached",
+      "Semi-Detached",
+      "Terraced",
+      "Flat/Maisonette",
+      "Other"
+    ],
+    "valid_regions": [
+      "North East",
+      "North West",
+      "Yorkshire and The Humber",
+      "East Midlands",
+      "West Midlands",
+      "East of England",
+      "London",
+      "South East",
+      "South West",
+      "Wales",
+      "Scotland",
+      "Northern Ireland"
+    ],
+    "valid_countries": [
+      "England",
+      "Wales",
+      "Scotland",
+      "Northern Ireland"
+    ]
+  },
+  "output": {
+    "log_directory": "./logs",
+    "reports_directory": "./reports"
+  },
+  "execution": {
+    "mode": "full_load",
+    "backup_on_full_load": true
+  }
+}

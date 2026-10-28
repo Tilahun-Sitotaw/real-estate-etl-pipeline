@@ -1,0 +1,141 @@
+# ==============================================================================
+# Git Ignore Configuration - Clean Academic Project Submission
+# ==============================================================================
+# This configuration ensures that only the source code, unit tests, and README.md
+# are tracked in Git, while all assignment documentation, Word/PDF reports,
+# diagrams, helper conversion scripts, datasets, logs, and AI/IDE caches are ignored.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Assignment Reports & Document-Related Files (Ignored for Git)
+# ------------------------------------------------------------------------------
+docs/
+SETUP.md
+*.doc
+*.docx
+*.pdf
+*.rtf
+*.odt
+FINAL_*
+*.html
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.txt
+
+# Document Generation & Helper Conversion Scripts
+generate_docx.py
+create_docx_file.py
+CREATE_DOCX.bat
+save_diagrams_as_png.html
+
+# ------------------------------------------------------------------------------
+# 2. Large Datasets (Do NOT commit >100MB files to Git)
+# ------------------------------------------------------------------------------
+Dataset/
+*.csv
+*.csv.gz
+*.tsv
+*.parquet
+*.zip
+*.tar.gz
+
+# ------------------------------------------------------------------------------
+# 3. Logs, Execution Audits & Report Dumps
+# ------------------------------------------------------------------------------
+logs/
+*.log
+reports/
+
+# ------------------------------------------------------------------------------
+# 4. Python Bytecode, Caches & Virtual Environments
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+ENV/
+.venv/
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ------------------------------------------------------------------------------
+# 5. Testing & Coverage Caches
+# ------------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ------------------------------------------------------------------------------
+# 6. Database Storage & Secrets
+# ------------------------------------------------------------------------------
+pgdata/
+*.sqlite3
+*.db
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------------------------
+# 7. IDE, AI Tools & Editor Metadata (Completely Filtered Out)
+# ------------------------------------------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.kiro/
+.kiro
+*.kiro
+.spec-*
+.gemini/
+.antigravity/
+.cursor/
+.claude/
+.copilot/
+.windsurf/
+
+# ------------------------------------------------------------------------------
+# 8. Operating System & Office Temporary Files
+# ------------------------------------------------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+~$*.doc
+~$*.docx
+~$*.ppt
+~$*.pptx
+~$*.xls
+~$*.xlsx
+*.tmp
+*.temp
+
+# ------------------------------------------------------------------------------
+# Explicitly Tracked Exceptions (Keep README, Config, Requirements & Core Files)
+# ------------------------------------------------------------------------------
+!README.md
+!requirements.txt
+!config.json
+!.gitignore
